@@ -21,7 +21,7 @@ def img_k_means(img, pixel_mode, k, n, S=None):
     that is, each pixel receives a label relative to it's cluster.
     """
     # Declaring return image
-    img_ret = np.zeros(img.shape, dtype=np.uint8)
+    img_ret = np.zeros(img.shape[:2], dtype=np.uint8)
     # Generating dataset for k-means
     dataset = dataset_gen_from_img(img, pixel_mode)
     # Selecting initial centroids (with S as the seed)
@@ -46,7 +46,8 @@ def img_k_means(img, pixel_mode, k, n, S=None):
                 img_ret[x, y] = min_dist + 1
         # Recalculating centroids
         clusters = np.array(clusters)
-        centroids = np.array([cluster.mean(axis=0) for cluster in clusters])
+        centroids = np.array(
+            [np.array(cluster).mean(axis=0) for cluster in clusters])
 
     return img_ret
 
@@ -110,8 +111,14 @@ if __name__ == "__main__":
     # i = input image, r = reference image
     ipath, rpath = str(input()).strip(), str(input()).strip()
     # reading images
-    img_i = imageio.imread(ipath)
-    img_r = imageio.imread(rpath)
+    if ipath.endswith('.npy'):
+        img_i = np.load(ipath)
+    else:
+        img_i = imageio.imread(ipath)
+    if rpath.endswith('.npy'):
+        img_r = np.load(rpath)
+    else:
+        img_r = imageio.imread(rpath)
     # 1 -> RGB; 2 -> RGBxy; 3 -> luminance; 4 -> luminance, x, y;
     pixel_mode = int(input(), base=10)
     if (pixel_mode not in [1, 2, 3, 4]):
