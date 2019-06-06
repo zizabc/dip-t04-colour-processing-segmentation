@@ -109,8 +109,9 @@ if __name__ == "__main__":
     # get user input and check validity
     # i = input image, r = reference image
     ipath, rpath = str(input()).strip(), str(input()).strip()
-    img_i, img_r = imageio.imread(ipath), imageio.imread(
-        rpath)  # reading images
+    # reading images
+    img_i = imageio.imread(ipath)
+    img_r = imageio.imread(rpath)
     # 1 -> RGB; 2 -> RGBxy; 3 -> luminance; 4 -> luminance, x, y;
     pixel_mode = int(input(), base=10)
     if (pixel_mode not in [1, 2, 3, 4]):
