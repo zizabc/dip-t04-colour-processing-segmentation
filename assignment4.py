@@ -13,6 +13,23 @@ import imageio
 # * Defining functions for assignment
 
 
+def init_centroids(dataset, k, S):
+    """Returns k random centroids from the dataset"""
+    random.seed(S)
+    return dataset[np.sort(random.sample(range(0, dataset.shape[0]), k))]
+
+
+def closest_centroid(dataset, centroids):
+    """Returns an array of the size of the image, with the ids of the closest
+        centroids to each element.
+    """
+    clusters = np.zeros(dataset.shape[0], dtype=int)
+    for idx, i in enumerate(dataset):
+        clusters[idx] = np.nanargmin(
+            [np.linalg.norm(centroid - i, ord=2) for centroid in centroids])
+    return clusters
+
+
 def img_k_means(img, pixel_mode, k, n, S=None):
     """ Performs k-means algorithm of an input image.
 
@@ -23,27 +40,21 @@ def img_k_means(img, pixel_mode, k, n, S=None):
     # Generating dataset for k-means
     dataset = dataset_gen_from_img(img, pixel_mode)
     # Selecting initial centroids (with S as the seed)
-    random.seed(S)
-    centroids = dataset[np.sort(
-        random.sample(range(0, img.shape[0] * img.shape[1]), k))]
-
-    # Initializing array of cluster id for each element of dataset
-    clusters = np.zeros(dataset.shape[0], dtype=int)
+    centroids = init_centroids(dataset, k, S)
+    clusters = None
 
     # Iterating
     for _ in range(k):
         # For each element of dataset,
         #   compute cluster based on minimum distance
-        for idx, i in enumerate(dataset):
-            clusters[idx] = np.nanargmin([
-                np.linalg.norm(centroid - i, ord=2) for centroid in centroids
-            ])
+        clusters = closest_centroid(dataset, centroids)
         # Update centroids with mean of its elements
         # centroids = calc_centroids(dataset, clusters, k)
         new_centroids = np.array(
             [np.nanmean(dataset[clusters == idx], axis=0) for idx in range(k)])
 
         # If there is no change to the centroids, break out of loop
+        # To avoid time limit
         if np.allclose(centroids, new_centroids, equal_nan=True):
             break
         centroids = new_centroids
