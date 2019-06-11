@@ -20,36 +20,35 @@ def img_k_means(img, pixel_mode, k, n, S=None):
     with labels defined by I(x, y) in {1, ..., k},
     that is, each pixel receives a label relative to it's cluster.
     """
-    # Declaring return image
-    img_ret = np.zeros(img.shape[:2], dtype=np.uint8)
     # Generating dataset for k-means
     dataset = dataset_gen_from_img(img, pixel_mode)
     # Selecting initial centroids (with S as the seed)
     random.seed(S)
-    ids = np.sort(random.sample(range(0, img_i.shape[0] * img_i.shape[1]), k))
-    centroids = [dataset[i] for i in ids]
+    centroids = dataset[np.sort(
+        random.sample(range(0, img.shape[0] * img.shape[1]), k))]
+
+    # Initializing array of cluster id for each element of dataset
+    clusters = np.zeros(dataset.shape[0], dtype=int)
 
     # Iterating
-    for _ in range(n):
-        # Initializing sets of points for each cluster
-        clusters = [[] for _ in range(k)]
-        for x in range(img.shape[0]):
-            for y in range(img.shape[1]):
-                # Computing Euclidean distance to each centroid
-                pixel = dataset[x * img.shape[0] + y]
-                dists = np.array([
-                    np.linalg.norm(pixel - centroid) for centroid in centroids
-                ])
-                # Adding pixel to closest cluster and marking in the image
-                min_dist = np.argmin(dists)
-                clusters[min_dist].append(pixel)
-                img_ret[x, y] = min_dist + 1
-        # Recalculating centroids
-        clusters = np.array(clusters)
-        centroids = np.array(
-            [np.array(cluster).mean(axis=0) for cluster in clusters])
+    for _ in range(k):
+        # For each element of dataset,
+        #   compute cluster based on minimum distance
+        for idx, i in enumerate(dataset):
+            clusters[idx] = np.nanargmin([
+                np.linalg.norm(centroid - i, ord=2) for centroid in centroids
+            ])
+        # Update centroids with mean of its elements
+        # centroids = calc_centroids(dataset, clusters, k)
+        new_centroids = np.array(
+            [np.nanmean(dataset[clusters == idx], axis=0) for idx in range(k)])
 
-    return img_ret
+        # If there is no change to the centroids, break out of loop
+        if np.allclose(centroids, new_centroids, equal_nan=True):
+            break
+        centroids = new_centroids
+
+    return clusters.reshape(img.shape[:2])
 
 
 def rmse(img_i, img_r):
@@ -61,8 +60,8 @@ def rmse(img_i, img_r):
 
 def normalize(img, min_value=0, max_value=255):
     """ Normalizes input image between min_value and max_value."""
-    return min_value \
-        + (img-img.min())*(max_value-min_value) / (img.max() - img.min())
+    return (min_value + (img - img.min()) * (max_value - min_value) /
+            (img.max() - img.min()))
 
 
 def dataset_gen_from_img(img, pixel_mode):
@@ -74,34 +73,34 @@ def dataset_gen_from_img(img, pixel_mode):
     dataset = None
     if (pixel_mode == 1):
         # R,G,B
-        dataset = np.array([
-            img[x, y, :] for x in range(img.shape[0])
-            for y in range(img.shape[1])
-        ],
-                           dtype=np.double)
+        dataset = img.reshape(img.shape[0] * img.shape[1], img.shape[2])
     elif (pixel_mode == 2):
         # R,G,B,x,y
-        dataset = np.array([[img[x, y, 0], img[x, y, 1], img[x, y, 2], x, y]
-                            for x in range(img.shape[0])
-                            for y in range(img.shape[1])],
-                           dtype=np.double)
+        dataset = []
+        for x in range(img.shape[0]):
+            for y in range(img.shape[1]):
+                dataset.append(
+                    [img[x, y, 0], img[x, y, 1], img[x, y, 2], x, y])
+        dataset = np.array(dataset)
     elif (pixel_mode == 3):
         # Luminance
         dataset = np.array([
-            0.299 * img[x, y, 0] + 0.587 * img[x, y, 1] + 0.114 * img[x, y, 2]
-            for x in range(img.shape[0]) for y in range(img.shape[1])
-        ],
-                           dtype=np.double)
+            0.299 * point[0] + 0.587 * point[1] + 0.114 * point[2]
+            for point in img.reshape(img.shape[0] * img.shape[1], img.shape[2])
+        ])
     elif (pixel_mode == 4):
         # Luminance, x, y
-        dataset = np.array([[
-            0.299 * img[x, y, 0] + 0.587 * img[x, y, 1] + 0.114 * img[x, y, 2],
-            x, y
-        ] for x in range(img.shape[0]) for y in range(img.shape[1])],
-                           dtype=np.double)
+        dataset = []
+        for x in range(img.shape[0]):
+            for y in range(img.shape[1]):
+                dataset.append([
+                    0.299 * img[x, y, 0] + 0.587 * img[x, y, 1] +
+                    0.114 * img[x, y, 2], x, y
+                ])
+        dataset = np.array(dataset)
     else:
         raise ValueError("Invalid value for pixel_mode")
-    return dataset
+    return dataset.astype(np.double)
 
 
 # %%
@@ -133,7 +132,6 @@ if __name__ == "__main__":
     S = input()  # User-defined seed
     random.seed(S)  # Testing errors for S
 
-    # Compute k-means and output
+    # Compute k-means, normalize and compare with reference image
     print('%.4f' % rmse(
-        normalize(img_k_means(img_i, pixel_mode, k, n, S), 0, 255).astype(
-            np.uint8), img_r))
+        normalize(img_k_means(img_i, pixel_mode, k, n, S), 0, 255), img_r))
