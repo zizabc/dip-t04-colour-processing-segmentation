@@ -8,7 +8,6 @@
 import numpy as np
 import random
 import imageio
-# import matplotlib.pyplot as plt # ! Remove after tests
 
 # %%
 # * Defining functions for assignment
@@ -50,13 +49,11 @@ def img_k_means(img, pixel_mode, k, n, S=None):
         #   compute cluster based on minimum distance
         clusters = closest_centroid(dataset, centroids)
         # Update centroids with mean of its elements
-        # centroids = calc_centroids(dataset, clusters, k)
         new_centroids = np.array(
             [np.nanmean(dataset[clusters == idx], axis=0) for idx in range(k)])
-
-        # If there is no change to the centroids, break out of loop
-        # To avoid time limit
-        if np.allclose(centroids, new_centroids, equal_nan=True):
+        # If there is little change to the centroids, break out of loop
+        # to avoid time limit.
+        if np.allclose(centroids, new_centroids, atol=0.1, equal_nan=True):
             break
         centroids = new_centroids
     return clusters.reshape(img.shape[:2])
