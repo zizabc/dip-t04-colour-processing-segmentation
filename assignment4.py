@@ -8,6 +8,7 @@
 import numpy as np
 import random
 import imageio
+# import matplotlib.pyplot as plt # ! Remove after tests
 
 # %%
 # * Defining functions for assignment
@@ -44,7 +45,7 @@ def img_k_means(img, pixel_mode, k, n, S=None):
     clusters = None
 
     # Iterating
-    for _ in range(k):
+    for _ in range(n):
         # For each element of dataset,
         #   compute cluster based on minimum distance
         clusters = closest_centroid(dataset, centroids)
@@ -58,7 +59,6 @@ def img_k_means(img, pixel_mode, k, n, S=None):
         if np.allclose(centroids, new_centroids, equal_nan=True):
             break
         centroids = new_centroids
-
     return clusters.reshape(img.shape[:2])
 
 
@@ -97,8 +97,9 @@ def dataset_gen_from_img(img, pixel_mode):
         # Luminance
         dataset = np.array([
             0.299 * point[0] + 0.587 * point[1] + 0.114 * point[2]
-            for point in img.reshape(img.shape[0] * img.shape[1], img.shape[2])
-        ])
+            for point in img.reshape(img.shape[0] * img.shape[1],
+                                     img.shape[2]).astype(np.double)
+        ]).reshape(-1, 1)
     elif (pixel_mode == 4):
         # Luminance, x, y
         dataset = []
@@ -140,7 +141,7 @@ if __name__ == "__main__":
     n = int(input(), base=10)  # n = number of iterations
     if (n <= 0):
         raise ValueError("n should be a positive integer value -> n > 0")
-    S = input()  # User-defined seed
+    S = int(input(), base=10)  # User-defined seed
     random.seed(S)  # Testing errors for S
 
     # Compute k-means, normalize and compare with reference image
