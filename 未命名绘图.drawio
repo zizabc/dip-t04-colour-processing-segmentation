@@ -1,4 +1,4 @@
-<mxfile host="app.diagrams.net" modified="2022-12-14T06:00:48.705Z" agent="5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36 Edg/108.0.1462.46" etag="EJ4FDufXXFpX1ZOlb-ne" version="20.6.2" type="github">
+<mxfile host="app.diagrams.net" modified="2022-12-14T08:34:39.481Z" agent="5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36 Edg/108.0.1462.46" etag="zP7jwAZahLcoOFS8rzi9" version="20.6.2" type="github">
   <diagram id="prtHgNgQTEPvFCAcTncT" name="Page-1">
     <mxGraphModel dx="961" dy="752" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
@@ -77,7 +77,7 @@
           <mxGeometry x="278.75" y="400" width="220" height="30" as="geometry" />
         </mxCell>
         <mxCell id="0qFGEBOAv3fDC5r-M1GS-70" value="搭建缺陷检测系统" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
-          <mxGeometry x="290" y="750" width="220" height="30" as="geometry" />
+          <mxGeometry x="288.75" y="740" width="220" height="30" as="geometry" />
         </mxCell>
         <mxCell id="0qFGEBOAv3fDC5r-M1GS-72" value="" style="shape=mxgraph.arrows.arrow_right;html=1;verticalLabelPosition=bottom;verticalAlign=top;strokeWidth=2;strokeColor=#000000;direction=east;" vertex="1" parent="1">
           <mxGeometry x="540" y="225" width="120" height="25" as="geometry" />
@@ -95,7 +95,7 @@
           <mxGeometry x="374.5" y="650" width="31" height="30" as="geometry" />
         </mxCell>
         <mxCell id="0qFGEBOAv3fDC5r-M1GS-78" value="" style="shape=mxgraph.arrows.arrow_down;html=1;verticalLabelPosition=bottom;verticalAlign=top;strokeWidth=2;strokeColor=#000000;fillStyle=hatch;fontFamily=Times New Roman;fontSize=21;" vertex="1" parent="1">
-          <mxGeometry x="376" y="720" width="31" height="30" as="geometry" />
+          <mxGeometry x="376" y="710" width="31" height="30" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
